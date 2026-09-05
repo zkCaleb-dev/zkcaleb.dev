@@ -1,17 +1,17 @@
 ---
-import '@fontsource-variable/bricolage-grotesque';
-import '@fontsource-variable/source-serif-4';
-import '@fontsource/fragment-mono';
+import '@fontsource-variable/space-grotesk';
+import '@fontsource-variable/jetbrains-mono';
 import '../styles/global.css';
 
 interface Props {
   title: string;
-  description?: string;
+  description: string;
+  lang: 'es' | 'en';
 }
-const { title, description = 'Caleb — software developer in Costa Rica. Projects and build log.' } = Astro.props;
+const { title, description, lang } = Astro.props;
 const path = Astro.url.pathname;
 ---
-<html lang="en">
+<html lang={lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -21,17 +21,6 @@ const path = Astro.url.pathname;
     <link rel="canonical" href={new URL(path, Astro.site)} />
   </head>
   <body>
-    <header class="wrap site-head">
-      <a class="mark" href="/"><b>zk</b>Caleb</a>
-      <nav>
-        <a href="/log" aria-current={path.startsWith('/log') ? 'page' : undefined}>log</a>
-        <a href="https://github.com/zkCaleb-dev" rel="me">github</a>
-      </nav>
-    </header>
     <slot />
-    <footer class="wrap site-foot">
-      <span>Caleb · Costa Rica</span>
-      <span>self-hosted on my own <a href="/log/001-homelab">homelab</a></span>
-    </footer>
   </body>
 </html>

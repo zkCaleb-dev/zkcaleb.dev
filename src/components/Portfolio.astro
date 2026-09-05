@@ -1,0 +1,180 @@
+---
+import Base from '../layouts/Base.astro';
+import { profile, skills, projects, education } from '../data/portfolio.js';
+import { ui } from '../data/i18n.js';
+
+interface Props { lang: 'es' | 'en' }
+const { lang } = Astro.props;
+const t = ui[lang];
+const altHref = lang === 'es' ? '/en/' : '/';
+const blogHref = (slug: string) =>
+  lang === 'es' ? `/projects/${slug}/` : `/en/projects/${slug}/`;
+---
+<Base title={`${profile.name} — ${profile.handle}`} description={t.description} lang={lang}>
+  <div class="wrap">
+    <header class="site-header">
+      <div class="logo">{profile.handle}<span>_</span></div>
+      <nav>
+        <a href="#skills">{t.navSkills}</a>
+        <a href="#projects">{t.navProjects}</a>
+        <a href="#education">{t.navEdu}</a>
+        <a class="lang-toggle" href={altHref}>{t.langLabel}</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="kicker whoami">$ whoami</div>
+      <h1>{profile.name}</h1>
+      <p class="lede">{profile.hero[lang]}</p>
+      <div class="chips">
+        {profile.chips.map((c) => <span class="chip">{c}</span>)}
+      </div>
+      <div class="cta-row">
+        <a class="cta" href={profile.github} target="_blank" rel="noopener">
+          {profile.github.replace('https://', '')} →
+        </a>
+      </div>
+    </section>
+
+    <section id="skills" class="block">
+      <div class="kicker num">01</div>
+      <h2>{t.skillsTitle}</h2>
+      <div class="skills-grid">
+        {skills.map((s) => (
+          <div class="card skill">
+            <div class="skill-name">{s.name}</div>
+            <div class="skill-desc">{s[lang]}</div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section id="projects" class="block">
+      <div class="kicker num">02</div>
+      <h2>{t.projectsTitle}</h2>
+      <div class="projects">
+        {projects.map((p) => (
+          <div class="card project">
+            <div>
+              <div class="project-name">{p.name}</div>
+              <div class="project-tag">{p.tag}</div>
+            </div>
+            <div>
+              <div class="project-desc">{p[lang]}</div>
+              <div class="project-links">
+                <a class="blog-link" href={blogHref(p.slug)}>{t.blogLink} →</a>
+                {p.url && (
+                  <a class="ext-link" href={p.url} target="_blank" rel="noopener">{p.urlLabel} ↗</a>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section id="education" class="block block--last">
+      <div class="kicker num">03</div>
+      <h2>{t.eduTitle}</h2>
+      <div class="edu">
+        {education.map((e) => (
+          <div class="edu-row">
+            <div class="edu-period">{e.period}</div>
+            <div>
+              <div class="edu-title">{e.title}</div>
+              <div class="edu-sub">{e.sub}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <div class="copy">© 2026 {profile.name} · {profile.handle}</div>
+      <a href={profile.github} target="_blank" rel="noopener">GitHub ↗</a>
+    </footer>
+  </div>
+</Base>
+
+<style>
+  nav { display: flex; align-items: center; gap: 28px; }
+  nav a { font-size: 14px; color: var(--body); }
+  nav a:hover { color: var(--green); }
+  .lang-toggle {
+    font-family: var(--mono); font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
+    color: var(--green) !important; border: 1px solid var(--line-hover); border-radius: 4px;
+    padding: 6px 12px;
+  }
+  .lang-toggle:hover { background: var(--chip); border-color: var(--green); }
+
+  .hero { padding: 96px 0 88px; border-bottom: 1px solid var(--line); }
+  .whoami { margin-bottom: 20px; }
+  .hero h1 {
+    margin: 0; font-size: clamp(38px, 6vw, 64px); font-weight: 700;
+    line-height: 1.05; letter-spacing: -0.02em; color: var(--title);
+  }
+  .lede {
+    margin: 22px 0 0; font-size: clamp(18px, 2.4vw, 22px); line-height: 1.5;
+    color: var(--body); max-width: 640px;
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
+  .chip {
+    font-family: var(--mono); font-size: 13px; color: var(--green-lt);
+    background: var(--chip); border: 1px solid var(--line-hover); border-radius: 4px;
+    padding: 6px 12px;
+  }
+  .cta-row { margin-top: 36px; }
+  .cta {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--mono); font-size: 14px; font-weight: 500;
+    color: var(--bg); background: var(--green); border-radius: 4px; padding: 12px 22px;
+  }
+  .cta:hover { background: var(--green-lt); color: var(--bg); }
+
+  .block { padding: 80px 0; border-bottom: 1px solid var(--line); }
+  .block--last { border-bottom: none; }
+  .num { margin-bottom: 12px; }
+  .block h2 {
+    margin: 0 0 40px; font-size: 32px; font-weight: 600;
+    letter-spacing: -0.01em; color: var(--title);
+  }
+
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 8px;
+    transition: border-color 120ms ease-out;
+  }
+  .card:hover { border-color: var(--line-hover); }
+
+  .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+  .skill { padding: 26px; }
+  .skill-name { font-family: var(--mono); font-size: 15px; font-weight: 600; color: var(--green-lt); margin-bottom: 10px; }
+  .skill-desc { font-size: 14.5px; line-height: 1.6; color: var(--body); }
+
+  .projects { display: flex; flex-direction: column; gap: 18px; }
+  .project {
+    display: grid; grid-template-columns: minmax(160px, 220px) minmax(0, 1fr);
+    gap: 24px; padding: 30px;
+  }
+  .project-name { font-size: 19px; font-weight: 600; color: var(--title); margin-bottom: 8px; }
+  .project-tag { font-family: var(--mono); font-size: 12px; color: var(--green); }
+  .project-desc { font-size: 15px; line-height: 1.65; color: var(--body); }
+  .project-links { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 16px; }
+  .blog-link { font-family: var(--mono); font-size: 13px; color: var(--green); }
+  .blog-link:hover { color: var(--green-lt); }
+  .ext-link { font-family: var(--mono); font-size: 13px; color: var(--dim); }
+  .ext-link:hover { color: var(--body); }
+
+  .edu { display: flex; flex-direction: column; }
+  .edu-row {
+    display: grid; grid-template-columns: minmax(120px, 160px) minmax(0, 1fr);
+    gap: 24px; padding: 22px 0; border-top: 1px solid var(--line);
+  }
+  .edu-period { font-family: var(--mono); font-size: 13px; color: var(--dim); }
+  .edu-title { font-size: 17px; font-weight: 600; color: var(--title); margin-bottom: 6px; }
+  .edu-sub { font-size: 14.5px; color: var(--body); }
+
+  @media (max-width: 560px) {
+    nav { gap: 16px; }
+    .project, .edu-row { grid-template-columns: 1fr; gap: 12px; }
+  }
+</style>
