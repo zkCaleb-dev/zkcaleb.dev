@@ -106,6 +106,10 @@ export const projects = [
 ];
 
 export const education = [
-  { period: '2021 — 2025', title: '[ Tu titulación aquí ]', sub: 'Institución · edita portfolio.js' },
-  { period: '2023', title: '[ Certificación o curso ]', sub: 'Plataforma o entidad · edita portfolio.js' },
+  { period: '2021 — 2024',
+    title: { es: 'Ingeniería en Sistemas', en: 'Systems Engineering' },
+    sub: { es: 'Universidad Fidélitas', en: 'Universidad Fidélitas' } },
+  { period: '2026',
+    title: { es: 'Curso de Google Cloud', en: 'Google Cloud course' },
+    sub: { es: 'Instituto Nacional de Aprendizaje (INA) · en curso', en: 'Instituto Nacional de Aprendizaje (INA) · in progress' } },
 ];
