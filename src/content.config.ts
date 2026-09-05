@@ -1,14 +1,14 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
-const log = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/log' }),
+// Un archivo por update, en src/content/updates/<slug-del-proyecto>/YYYY-MM-DD-titulo.md
+const updates = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/updates' }),
   schema: z.object({
-    title: z.string(),
+    project: z.string(),
     date: z.coerce.date(),
-    tags: z.array(z.string()).default([]),
-    summary: z.string(),
+    title: z.string(),
   }),
 });
 
-export const collections = { log };
+export const collections = { updates };

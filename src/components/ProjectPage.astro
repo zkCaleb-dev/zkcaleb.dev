@@ -1,0 +1,121 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+import { profile, projects } from '../data/portfolio.js';
+import { ui } from '../data/i18n.js';
+
+interface Props { lang: 'es' | 'en'; slug: string }
+const { lang, slug } = Astro.props;
+const t = ui[lang];
+const backHref = lang === 'es' ? '/' : '/en/';
+const proj = projects.find((p) => p.slug === slug) ?? projects[0];
+
+const all = await getCollection('updates', (e) => e.data.project === proj.slug);
+const entries = all.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const rendered = await Promise.all(
+  entries.map(async (e) => ({ ...e, Content: (await render(e)).Content }))
+);
+const fmt = (d: Date) => d.toISOString().slice(0, 10);
+---
+<Base title={`${proj.name} — ${profile.handle}`} description={proj[lang]} lang={lang}>
+  <div class="wrap wrap--narrow">
+    <header class="site-header">
+      <a class="back mono" href={backHref}>← {t.back}</a>
+      <div class="logo">{profile.handle}<span>_</span></div>
+    </header>
+
+    <section class="proj-head">
+      <div class="kicker label">{t.blogOf}</div>
+      <h1>{proj.name}</h1>
+      <div class="tag mono">{proj.tag}</div>
+      <p class="desc">{proj[lang]}</p>
+      {proj.role && <p class="role mono">{proj.role[lang]}</p>}
+      {proj.links.length > 0 && (
+        <div class="links">
+          {proj.links.map((l) => (
+            <a class="mono" href={l.url} target="_blank" rel="noopener">{l.label} ↗</a>
+          ))}
+        </div>
+      )}
+    </section>
+
+    {proj.highlights && (
+      <section class="highlights">
+        <h2>{t.highlightsTitle}</h2>
+        <ul>
+          {proj.highlights[lang].map((h) => <li>{h}</li>)}
+        </ul>
+      </section>
+    )}
+
+    <section class="updates">
+      <h2>{t.updates}</h2>
+      <div class="list">
+        {rendered.map((post) => (
+          <article>
+            <div class="date mono">{fmt(post.data.date)}</div>
+            <div class="body">
+              <h3>{post.data.title}</h3>
+              <post.Content />
+            </div>
+          </article>
+        ))}
+        {rendered.length === 0 && <div class="empty mono">{t.empty}</div>}
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <div class="copy">© 2026 {profile.name} · {profile.handle}</div>
+      <a href={backHref}>{t.back}</a>
+    </footer>
+  </div>
+</Base>
+
+<style>
+  .back { font-size: 14px; color: var(--body); }
+  .back:hover { color: var(--green); }
+  .logo { font-size: 14px; }
+
+  .proj-head { padding: 72px 0 56px; border-bottom: 1px solid var(--line); }
+  .label { margin-bottom: 16px; }
+  .proj-head h1 {
+    margin: 0; font-size: clamp(34px, 5vw, 52px); font-weight: 700;
+    letter-spacing: -0.02em; color: var(--title);
+  }
+  .tag { font-size: 13px; color: var(--dim); margin-top: 14px; }
+  .desc { margin: 20px 0 0; font-size: 16.5px; line-height: 1.6; color: var(--body); max-width: 640px; }
+  .role { margin: 14px 0 0; font-size: 13px; color: var(--dim); }
+  .links { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 18px; }
+  .links a { font-size: 13px; }
+
+  .highlights { padding: 56px 0; border-bottom: 1px solid var(--line); }
+  .highlights h2, .updates h2 { margin: 0 0 28px; font-size: 22px; font-weight: 600; color: var(--title); }
+  .highlights ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 14px; }
+  .highlights li {
+    position: relative; padding-left: 22px;
+    font-size: 15px; line-height: 1.65; color: var(--body); max-width: 640px;
+  }
+  .highlights li::before {
+    content: '▸'; position: absolute; left: 0; color: var(--green);
+    font-family: var(--mono); font-size: 13px; top: 2px;
+  }
+
+  .updates { padding: 56px 0 80px; }
+  .updates h2 { margin-bottom: 36px; }
+  .list { display: flex; flex-direction: column; gap: 36px; }
+  article { display: grid; grid-template-columns: minmax(110px, 140px) minmax(0, 1fr); gap: 24px; }
+  .date { font-size: 13px; color: var(--green); padding-top: 3px; }
+  .body { border-left: 1px solid var(--line); padding-left: 24px; }
+  .body h3 { margin: 0 0 12px; font-size: 18px; font-weight: 600; color: var(--title); }
+  .body :global(p) { margin: 0 0 12px; font-size: 15px; line-height: 1.7; color: var(--body); }
+  .body :global(a) { color: var(--green); }
+  .body :global(code) { font-family: var(--mono); font-size: 0.85em; background: var(--chip); padding: 0.1em 0.35em; border-radius: 4px; }
+  .body :global(pre) { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 16px 20px; overflow-x: auto; }
+  .body :global(pre code) { background: none; padding: 0; }
+  .empty { font-size: 14px; color: var(--dim); }
+
+  @media (max-width: 560px) {
+    article { grid-template-columns: 1fr; gap: 8px; }
+    .body { border-left: none; padding-left: 0; }
+  }
+</style>
