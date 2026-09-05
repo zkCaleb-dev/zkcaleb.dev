@@ -1,0 +1,158 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const entries = (await getCollection('log')).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+const latest = entries.slice(0, 3);
+
+const projects = [
+  {
+    name: 'UnRojo',
+    status: 'active',
+    note: 'Business management app in daily production use. Small on purpose: two users who depend on it every day, zero tolerance for downtime.',
+    stack: 'TypeScript · Postgres',
+  },
+  {
+    name: 'SIGA',
+    status: 'active',
+    note: 'Internal management system for a small team. Built to replace spreadsheets with something that actually enforces the process.',
+    stack: 'TypeScript · Postgres',
+  },
+  {
+    name: 'Homelab',
+    status: 'active',
+    note: 'A bare-metal deployment platform in my living room — Coolify, Tailscale, Cloudflare Tunnel, zero ports open on the router. This site runs on it.',
+    stack: 'Ubuntu · Docker · Tailscale',
+    href: '/log/001-homelab',
+  },
+  {
+    name: 'Stellar / Soroban examples',
+    status: 'shipped',
+    note: 'Smart contracts and backend examples for Stellar blockchain development, written for the Impacta bootcamp.',
+    stack: 'Rust · Soroban SDK · TypeScript',
+    href: 'https://github.com/zkCaleb-dev/ImpactaBootcamp-ExampleRepos',
+  },
+];
+
+const fmt = (d: Date) =>
+  d.toLocaleDateString('en-US', { timeZone: 'UTC', year: 'numeric', month: 'short', day: '2-digit' });
+---
+<Base title="Caleb — software developer">
+  <main class="wrap reveal">
+    <section class="hero">
+      <p class="kicker">logbook of</p>
+      <h1>Caleb</h1>
+      <p class="lede">
+        Software developer in Costa Rica. I build backends and Stellar smart
+        contracts, and I run the infrastructure they live on — down to the
+        machine in my living room.
+      </p>
+      <p class="now mono">
+        <span class="status active">now</span>
+        turning a bare-metal box into a fault-tolerant app platform
+      </p>
+    </section>
+
+    <section class="projects" aria-labelledby="p-head">
+      <h2 id="p-head" class="kicker">projects</h2>
+      <ol>
+        {projects.map((p, i) => (
+          <li>
+            <span class="idx mono">{String(i + 1).padStart(2, '0')}</span>
+            <div class="p-body">
+              <div class="p-line">
+                <h3>{p.href ? <a href={p.href}>{p.name}</a> : p.name}</h3>
+                <span class={`status ${p.status}`}>{p.status}</span>
+              </div>
+              <p>{p.note}</p>
+              <p class="stack mono">{p.stack}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <section class="latest" aria-labelledby="l-head">
+      <h2 id="l-head" class="kicker">latest from the log</h2>
+      <ul>
+        {latest.map((e) => (
+          <li>
+            <a href={`/log/${e.id}`}>{e.data.title}</a>
+            <time class="mono" datetime={e.data.date.toISOString()}>{fmt(e.data.date)}</time>
+          </li>
+        ))}
+      </ul>
+      <p class="all"><a href="/log">all entries →</a></p>
+    </section>
+  </main>
+</Base>
+
+<style>
+  .hero {
+    padding-block: var(--sp-3xl) var(--sp-2xl);
+  }
+  .hero h1 {
+    font-size: var(--step-3);
+    font-weight: 750;
+    margin-top: var(--sp-sm);
+  }
+  .lede {
+    font-size: var(--step-1);
+    line-height: 1.45;
+    max-width: 34ch;
+    color: var(--text-mid);
+    margin: var(--sp-lg) 0 0;
+  }
+  .lede :global(strong) { color: var(--text-hi); }
+  .now {
+    margin: var(--sp-xl) 0 0;
+    font-size: 0.85rem;
+    color: var(--text-mid);
+  }
+
+  .projects { padding-block: var(--sp-2xl); border-top: 1px solid var(--line); }
+  .projects ol {
+    list-style: none;
+    margin: var(--sp-lg) 0 0;
+    padding: 0;
+    display: grid;
+    gap: var(--sp-xl);
+  }
+  .projects li {
+    display: grid;
+    grid-template-columns: 3.5rem 1fr;
+    align-items: baseline;
+  }
+  .idx { color: var(--text-low); font-size: 0.8rem; }
+  .p-line {
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-md);
+    flex-wrap: wrap;
+  }
+  .p-body h3 { font-size: var(--step-1); font-weight: 640; }
+  .p-body h3 a { color: inherit; text-decoration-color: color-mix(in oklch, var(--accent) 55%, transparent); }
+  .p-body p { margin: var(--sp-sm) 0 0; max-width: 56ch; color: var(--text-mid); }
+  .stack { color: var(--text-low); font-size: 0.75rem; }
+
+  .latest { padding-block: var(--sp-2xl) var(--sp-3xl); border-top: 1px solid var(--line); }
+  .latest ul { list-style: none; margin: var(--sp-lg) 0 0; padding: 0; }
+  .latest li {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--sp-lg);
+    padding-block: var(--sp-sm);
+  }
+  .latest li a { font-family: var(--font-display); font-size: 1.1rem; color: var(--text-hi); }
+  .latest time { color: var(--text-low); font-size: 0.78rem; white-space: nowrap; }
+  .all { margin: var(--sp-lg) 0 0; font-family: var(--font-mono); font-size: 0.85rem; }
+
+  @media (max-width: 40rem) {
+    .projects li { grid-template-columns: 1fr; }
+    .idx { display: none; }
+    .latest li { flex-direction: column; gap: var(--sp-xs); }
+  }
+</style>

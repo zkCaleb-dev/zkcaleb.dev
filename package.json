@@ -1,0 +1,17 @@
+{
+  "name": "zkcaleb.dev",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@fontsource-variable/bricolage-grotesque": "^5.2.0",
+    "@fontsource-variable/source-serif-4": "^5.2.0",
+    "@fontsource/fragment-mono": "^5.2.0",
+    "astro": "^5.13.0"
+  }
+}
